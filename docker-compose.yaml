@@ -1,0 +1,62 @@
+# @format
+
+version: '3.8'
+
+services:
+  # Spring Boot Application
+  posbackend:
+    image: posbackend:latest
+    container_name: posbackend
+    restart: always
+    depends_on:
+      - mongodb
+      - nats-server
+    networks:
+      - app-network
+
+  # MongoDB
+  mongodb:
+    image: mongo:latest
+    container_name: mongodb
+    restart: always
+    volumes:
+      - ~/data:/data/db
+    ports:
+      - '27017:27017'
+    networks:
+      - app-network
+
+  # NATS Server
+  nats-server:
+    image: nats:latest
+    container_name: nats-server
+    restart: always
+    ports:
+      - '4222:4222'
+      - '8222:8222'
+      - '8080:8080'
+    volumes:
+      - ./nats-server.conf:/nats-server.conf
+    command: ['nats-server', '--config', '/nats-server.conf']
+    networks:
+      - app-network
+
+  # Watchtower
+  watchtower:
+    image: containrrr/watchtower
+    container_name: watchtower
+    restart: unless-stopped
+    environment:
+      - TZ=Europe/London
+      - WATCHTOWER_CLEANUP=true
+      - WATCHTOWER_ROLLING_RESTART=true
+    volumes:
+      - ${PWD}:/config/
+      - /var/run/docker.sock:/var/run/docker.sock
+    command: --interval 20
+    networks:
+      - app-network
+
+networks:
+  app-network:
+    driver: bridge
