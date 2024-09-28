@@ -37,7 +37,7 @@ services:
       - '8080:8080'
     volumes:
       - ./nats-server.conf:/nats-server.conf
-    command: ['nats-server', '--config', '/nats-server.conf']
+    command: ['--config', '/nats-server.conf']
     networks:
       - app-network
 
