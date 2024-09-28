@@ -11,6 +11,9 @@ services:
     depends_on:
       - mongodb
       - nats-server
+    environment:
+      - NATS_URL=nats://nats-server:4222
+      - SPRING_PROFILES_ACTIVE=default
     networks:
       - app-network
 
