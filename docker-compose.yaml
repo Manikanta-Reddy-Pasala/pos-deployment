@@ -8,6 +8,8 @@ services:
     image: gitlab.oneshell.in:5050/server/posbackend/qa:latest
     container_name: posbackend
     restart: always
+    ports:
+      - '8062:8062'
     depends_on:
       - mongodb
       - nats-server
