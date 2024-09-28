@@ -17,6 +17,14 @@ services:
       - NATS_URL=nats://nats-server:4222
       - SPRING_PROFILES_ACTIVE=default
       - MONGODB_URI=mongodb://mongodb:27017/pos
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0' # Limit to 1 CPU core
+          memory: 1536M # Limit to 1.5GB RAM
+        reservations:
+          cpus: '0.3' # Reserve 0.5 CPU cores
+          memory: 350M # Reserve 512MB RAM
     networks:
       - app-network
 
@@ -31,6 +39,14 @@ services:
       - 'com.centurylinklabs.watchtower.enable=false'
     ports:
       - '27017:27017'
+    deploy:
+      resources:
+        limits:
+          cpus: '1.0' # Limit to 1 CPU core
+          memory: 1536M # Limit to 1.5GB RAM
+        reservations:
+          cpus: '0.3' # Reserve 0.5 CPU cores
+          memory: 300M # Reserve 512MB RAM
     networks:
       - app-network
 
@@ -48,6 +64,14 @@ services:
     volumes:
       - ./nats-server.conf:/nats-server.conf
     command: ['--config', '/nats-server.conf']
+    deploy:
+      resources:
+        limits:
+          cpus: '0.75' # Limit to 0.75 CPU cores
+          memory: 1024M # Limit to 1GB RAM
+        reservations:
+          cpus: '0.2' # Reserve 0.5 CPU cores
+          memory: 64M # Reserve 512MB RAM
     networks:
       - app-network
 
@@ -66,6 +90,14 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/.docker/config.json:/config.json # Mount Docker auth file
     command: --interval 20
+    deploy:
+      resources:
+        limits:
+          cpus: '0.2' # Limit to 0.5 CPU cores
+          memory: 128M # Limit to 128MB RAM
+        reservations:
+          cpus: '0.1' # Reserve 0.25 CPU cores
+          memory: 64M # Reserve 64MB RAM
     networks:
       - app-network
 
