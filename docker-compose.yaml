@@ -5,7 +5,7 @@ version: '3.8'
 services:
   # Spring Boot Application
   posbackend:
-    image: posbackend:latest
+    image: gitlab.oneshell.in:5050/server/posbackend/qa:latest
     container_name: posbackend
     restart: always
     depends_on:
