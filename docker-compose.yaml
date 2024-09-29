@@ -88,7 +88,7 @@ services:
       - WATCHTOWER_ROLLING_RESTART=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/.docker/config.json:/config.json # Mount Docker auth file
+      - ./config.json:/config.json # Mount Docker auth file
     command: --interval 20
     deploy:
       resources:
