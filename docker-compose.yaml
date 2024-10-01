@@ -55,12 +55,6 @@ services:
           memory: 300M # Reserve 512MB RAM
     networks:
       - app-network
-    healthcheck:
-      test: ['CMD', 'mongo', '--eval', "db.adminCommand('ping')"]
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 20s
 
   # NATS Server
   nats-server:
@@ -86,12 +80,6 @@ services:
           memory: 64M # Reserve 512MB RAM
     networks:
       - app-network
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8222/healthz']
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 10s
 
   # Watchtower
   watchtower:
@@ -118,12 +106,6 @@ services:
           memory: 64M # Reserve 64MB RAM
     networks:
       - app-network
-    healthcheck:
-      test: ['CMD', 'curl', '-f', 'http://localhost:8080']
-      interval: 30s
-      timeout: 10s
-      retries: 3
-      start_period: 30s
 
 networks:
   app-network:
