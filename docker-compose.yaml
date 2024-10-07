@@ -15,6 +15,7 @@ services:
       - nats-server
     environment:
       - NATS_URL=nats://nats-server:4222
+      - NATS_REMOTE_URL=nats://nats.oneshell.in:4222
       - SPRING_PROFILES_ACTIVE=default
       - MONGODB_URI=mongodb://mongodb:27017/pos
     deploy:
