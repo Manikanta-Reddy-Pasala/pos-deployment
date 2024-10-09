@@ -18,6 +18,8 @@ services:
       - NATS_REMOTE_URL=nats://nats.oneshell.in:4222
       - SPRING_PROFILES_ACTIVE=default
       - MONGODB_URI=mongodb://mongodb:27017/pos
+    volumes:
+      - ~/data/logs:/var/log/posbackend # Host directory mapped to container log directory
     deploy:
       resources:
         limits:
