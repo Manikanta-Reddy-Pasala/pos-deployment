@@ -84,6 +84,20 @@ services:
     networks:
       - app-network
 
+  # POS Web
+  pos-web:
+    image: gitlab.oneshell.in:5050/pos/pos/qa:latest
+    container_name: pos-web
+    restart: always
+    ports:
+      - '80:3000' # Map external port 80 to internal port 3000
+    depends_on:
+      - mongodb
+      - nats-server
+      - posbackend
+    networks:
+      - app-network
+
   # Watchtower
   watchtower:
     image: containrrr/watchtower
