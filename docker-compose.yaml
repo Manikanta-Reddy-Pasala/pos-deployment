@@ -90,7 +90,7 @@ services:
     container_name: pos-web
     restart: always
     ports:
-      - '80:3000' # Map external port 80 to internal port 3000
+      - '80:80'
     depends_on:
       - mongodb
       - nats-server
