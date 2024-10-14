@@ -1,11 +1,10 @@
 # @format
-
 version: '3.8'
 
 services:
   # Spring Boot Application
   posbackend:
-    image: gitlab.oneshell.in:5050/server/posbackend/qa:latest
+    image: oneshell/posbackend:latest
     container_name: posbackend
     restart: always
     ports:
@@ -39,7 +38,7 @@ services:
 
   # MongoDB
   mongodb:
-    image: mongo:latest
+    image: oneshell/mongo:latest
     container_name: mongodb
     restart: always
     volumes:
@@ -61,7 +60,7 @@ services:
 
   # NATS Server
   nats-server:
-    image: nats:latest
+    image: oneshell/nats:latest
     container_name: nats-server
     restart: always
     labels:
@@ -73,6 +72,9 @@ services:
     volumes:
       - ./nats-server.conf:/nats-server.conf
     command: ['--config', '/nats-server.conf']
+    environment:
+      - JS_STORAGE_TYPE=file
+      - JS_STORAGE_DIR=/data/jetstream
     deploy:
       resources:
         limits:
@@ -81,20 +83,6 @@ services:
         reservations:
           cpus: '0.2' # Reserve 0.5 CPU cores
           memory: 64M # Reserve 512MB RAM
-    networks:
-      - app-network
-
-  # POS Web
-  pos-web:
-    image: gitlab.oneshell.in:5050/pos/pos/qa:latest
-    container_name: pos-web
-    restart: always
-    ports:
-      - '80:80'
-    depends_on:
-      - mongodb
-      - nats-server
-      - posbackend
     networks:
       - app-network
 
