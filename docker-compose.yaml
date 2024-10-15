@@ -112,29 +112,6 @@ services:
     networks:
       - app-network
 
-  # Compose Updater - New Service
-  compose-updater:
-    image: alpine:latest
-    container_name: compose-updater
-    restart: always
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # Access to Docker
-    environment:
-      - REPO_URL=https://github.com/your-repo/your-project.git # Replace with your repo
-      - COMPOSE_FILE_PATH=docker-compose.yml # Path to docker-compose file in repo
-      - SCRIPT_FILE_PATH=update-compose.sh # Path to update script in repo
-    command: /usr/local/bin/update-compose.sh
-    networks:
-      - app-network
-    deploy:
-      resources:
-        limits:
-          cpus: '0.2'
-          memory: 256M
-        reservations:
-          cpus: '0.1'
-          memory: 128M
-
 networks:
   app-network:
     driver: bridge
