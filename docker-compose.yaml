@@ -22,11 +22,11 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0' # Limit to 1 CPU core
-          memory: 1536M # Limit to 1.5GB RAM
+          cpus: '2.0' # Limit to 1 CPU core
+          memory: 2536M # Limit to 1.5GB RAM
         reservations:
-          cpus: '0.3' # Reserve 0.5 CPU cores
-          memory: 350M # Reserve 512MB RAM
+          cpus: '1' # Reserve 0.5 CPU cores
+          memory: 500M # Reserve 512MB RAM
     networks:
       - app-network
     healthcheck:
