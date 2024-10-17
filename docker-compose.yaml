@@ -4,7 +4,7 @@ version: '3.8'
 services:
   # Spring Boot Application
   posbackend:
-    image: gitlab.oneshell.in:5050/server/posbackend/qa:latest
+    image: docker.oneshell.in/library/posbackend:latest
     container_name: posbackend
     restart: always
     ports:
@@ -38,7 +38,7 @@ services:
 
   # MongoDB
   mongodb:
-    image: mongo:latest
+    image: docker.oneshell.in/library/mongo:latest
     container_name: mongodb
     restart: always
     volumes:
@@ -60,7 +60,7 @@ services:
 
   # NATS Server
   nats-server:
-    image: nats:latest
+    image: docker.oneshell.in/library/nats:latest
     container_name: nats-server
     restart: always
     labels:
