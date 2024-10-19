@@ -1,4 +1,5 @@
 # @format
+
 version: '3.8'
 
 services:
@@ -22,15 +23,37 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '2.0' # Limit to 1 CPU core
-          memory: 2536M # Limit to 1.5GB RAM
+          cpus: '2.0' # Limit to 2 CPU cores
+          memory: 2536M # Limit to 2.5GB RAM
         reservations:
-          cpus: '1' # Reserve 0.5 CPU cores
+          cpus: '1' # Reserve 1 CPU core
           memory: 500M # Reserve 512MB RAM
     networks:
       - app-network
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8090/actuator/health']
+      interval: 30s
+      timeout: 10s
+      retries: 3
+      start_period: 40s
+
+  # Node.js Backend Application
+  posNodeBackend:
+    image: docker.oneshell.in/library/posnodebackend:latest
+    container_name: posNodeBackend
+    restart: always
+    ports:
+      - '3001:3001'
+    depends_on:
+      - mongodb
+    environment:
+      - NODE_ENV=production
+    volumes:
+      - ~/data/logs:/var/log/posNodeBackend # Host directory mapped to container log directory
+    networks:
+      - app-network
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'http://localhost:3001/health']
       interval: 30s
       timeout: 10s
       retries: 3
