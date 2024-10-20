@@ -1,7 +1,7 @@
 # Use Python slim as the base image
 FROM python:3.10-slim
 
-# Install necessary tools: git, curl, Docker, Docker Compose, and Flask
+# Install necessary tools: git, curl, Docker, and Docker Compose
 RUN apt-get update && \
     apt-get install -y --no-install-recommends \
     curl \
@@ -17,9 +17,11 @@ RUN apt-get update && \
     apt-get update && \
     # Install Docker
     apt-get install -y docker.io && \
-    # Manually install Docker Compose from GitHub releases
+    # Install Docker Compose from GitHub
     curl -L "https://github.com/docker/compose/releases/download/v2.20.0/docker-compose-$(uname -s)-$(uname -m)" -o /usr/local/bin/docker-compose && \
     chmod +x /usr/local/bin/docker-compose && \
+    # Verify Docker Compose installation
+    docker-compose --version && \
     # Clean up
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
@@ -33,8 +35,8 @@ WORKDIR /app
 # Copy the merged Python script into the container
 COPY main.py /app/main.py
 
-# Expose port 5000 (optional)
+# Expose port 5000
 EXPOSE 5000
 
-# Run the Flask app directly
+# Set the entrypoint to run the Flask app
 CMD ["python", "/app/main.py"]
