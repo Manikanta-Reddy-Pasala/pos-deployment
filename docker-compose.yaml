@@ -144,6 +144,7 @@ services:
     environment:
       - GITHUB_REPO=https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git
       - COMPOSE_FILE_PATH=docker-compose.yaml
+      - REQUIRED_SERVICES=compose-updater,mongodb,nats-server,posbackend,watchtower
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/data/logs:/app/logs

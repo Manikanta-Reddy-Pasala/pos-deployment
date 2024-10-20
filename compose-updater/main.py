@@ -14,6 +14,7 @@ app = Flask(__name__)
 client = docker.DockerClient(base_url='unix://var/run/docker.sock')
 
 # Environment variables
+REQUIRED_SERVICES = os.getenv('REQUIRED_SERVICES', 'compose-updater,mongodb,nats-server,posNodeBackend,posbackend,watchtower').split(',')
 GITHUB_REPO = os.getenv('GITHUB_REPO', 'https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git')
 COMPOSE_FILE_PATH = os.getenv('COMPOSE_FILE_PATH', 'docker-compose/docker-compose.yaml')
 REPO_DIR = '/app/repo'
@@ -74,13 +75,20 @@ thread.start()
 def health_check():
     containers = client.containers.list()
     status = {}
-    for container in containers:
-        container_info = {
-            'status': container.status,
-            'name': container.name
-        }
-        status[container.name] = container_info
-    return jsonify(status)
+
+    # Check if all required services are running
+    all_services_running = True
+    for required_service in REQUIRED_SERVICES:
+        container_status = next((container.status for container in containers if container.name == required_service), 'not found')
+        if container_status != 'running':
+            all_services_running = False
+        status[required_service] = container_status
+
+    # Return success or failure based on the status of the services
+    if all_services_running:
+        return jsonify({"status": "success", "message": "All services are running"}), 200
+    else:
+        return jsonify({"status": "failure", "message": "One or more services are not running", "details": status}), 500
 
 # Route to download logs of all running containers as a zip file
 @app.route('/logs', methods=['GET'])
