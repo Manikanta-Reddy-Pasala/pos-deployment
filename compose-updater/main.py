@@ -26,7 +26,10 @@ LOG_DIR = "/app/logs"
 EXCLUDED_LOGS = ["mongodb.log", "watchtower.log", "nats-server.log", "compose-updater.log"]
 
 def pull_and_apply_compose():
-    logging.info("Checking for updates in the repository...")
+    GITHUB_REPO = os.getenv('GITHUB_REPO', 'https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git')
+    COMPOSE_FILE_PATH = os.getenv('COMPOSE_FILE_PATH', 'docker-compose/docker-compose.yaml')
+    REPO_DIR = '/app/repo'
+    
     try:
         if os.path.exists(REPO_DIR):
             if os.path.isdir(REPO_DIR):
@@ -34,7 +37,7 @@ def pull_and_apply_compose():
                     repo = git.Repo(REPO_DIR)
                     logging.info(f"Using existing repository in {REPO_DIR}")
                 except git.exc.InvalidGitRepositoryError:
-                    logging.warning(f"Invalid Git repository. Cleaning up {REPO_DIR}...")
+                    logging.info(f"Invalid Git repository. Cleaning up {REPO_DIR}...")
                     shutil.rmtree(REPO_DIR)
                     logging.info(f"Deleted {REPO_DIR}. Cloning fresh repository.")
                     repo = git.Repo.clone_from(GITHUB_REPO, REPO_DIR)
@@ -44,35 +47,27 @@ def pull_and_apply_compose():
         else:
             logging.info(f"Cloning repository from {GITHUB_REPO} into {REPO_DIR}...")
             repo = git.Repo.clone_from(GITHUB_REPO, REPO_DIR)
-
-        # Ensure we are on the master branch
+        
         if repo.active_branch.name != 'master':
             logging.info("Switching to master branch...")
             repo.git.checkout('master')
-
-        # Force reset to remove local changes (if any) and ensure the repo is clean
-        logging.info("Resetting repository to the latest commit from origin...")
-        repo.git.reset('--hard', 'origin/master')
-
-        # Fetch the latest changes from the origin
+        
+        current = repo.head.commit
         repo.remotes.origin.fetch()
-        latest = repo.remotes.origin.refs.master.commit  # Get the latest commit from remote master
-        current = repo.head.commit  # Get the current commit in the local repo
-
+        latest = repo.head.commit
         logging.info(f"Current commit: {current}, Latest commit: {latest}")
 
-        # Pull the latest changes if there are any
         if current != latest:
             logging.info("Changes detected, pulling updates...")
             repo.remotes.origin.pull('master')
-            subprocess.run(['docker-compose', '-f', f"{REPO_DIR}/{COMPOSE_FILE_PATH}", 'pull'], check=True)
+            # Use --platform to specify amd64 to avoid platform mismatch
+            subprocess.run(['docker-compose', '-f', f"{REPO_DIR}/{COMPOSE_FILE_PATH}", 'pull', '--platform', 'linux/amd64'], check=True)
             subprocess.run(['docker-compose', '-f', f"{REPO_DIR}/{COMPOSE_FILE_PATH}", 'up', '-d', '--no-recreate'], check=True)
         else:
             logging.info("No changes detected, skipping docker-compose up.")
-
+    
     except Exception as e:
         logging.error(f"Error during the pull-and-apply process: {e}")
-
 # Function to run periodic checks
 def periodic_check():
     while True:
