@@ -54,12 +54,15 @@ def pull_and_apply_compose():
             logging.info("Switching to master branch...")
             repo.git.checkout('master')
 
+
+        # Fetch latest changes
+        current = repo.head.commit
+
         # Force reset to remove local changes and ensure the repo is clean
         logging.info("Resetting repository to the latest commit from origin...")
         repo.git.reset('--hard', 'origin/master')
 
-        # Fetch latest changes
-        current = repo.head.commit
+    
         repo.remotes.origin.fetch()
         latest = repo.head.commit
         logging.info(f"Current commit: {current}, Latest commit: {latest}")
@@ -76,7 +79,7 @@ def pull_and_apply_compose():
     except Exception as e:
         logging.error(f"Error during the pull-and-apply process: {e}")
 
-        
+
 def periodic_check():
     while True:
         logging.info("Starting periodic update check...")
