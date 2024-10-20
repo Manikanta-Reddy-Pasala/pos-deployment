@@ -105,7 +105,7 @@ services:
           memory: 1024M # Limit to 1GB RAM
         reservations:
           cpus: '0.2' # Reserve 0.5 CPU cores
-          memory: 64M # Reserve 512MB RAM
+          memory: 63M # Reserve 512MB RAM
     networks:
       - app-network
 
