@@ -25,7 +25,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Flask for the API
-RUN pip install flask docker
+RUN pip install flask docker gunicorn
 
 # Set working directory
 WORKDIR /app

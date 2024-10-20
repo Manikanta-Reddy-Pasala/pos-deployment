@@ -4,10 +4,8 @@
 pull_and_apply_compose() {
   # Check if the repo already exists
   if [ ! -d "/app/repo" ]; then
-    # Clone the repository if it doesn't exist
     git clone $GITHUB_REPO /app/repo
   else
-    # Pull the latest changes if the repository exists
     cd /app/repo
     git fetch
     LOCAL=$(git rev-parse HEAD)
@@ -17,7 +15,6 @@ pull_and_apply_compose() {
     if [ "$LOCAL" != "$REMOTE" ]; then
       echo "Changes detected, pulling updates..."
       git pull
-      # Pull the latest images and bring up only changed services without recreating existing ones
       docker-compose -f /app/repo/$COMPOSE_FILE_PATH pull
       docker-compose -f /app/repo/$COMPOSE_FILE_PATH up -d --no-recreate
     else
@@ -29,8 +26,8 @@ pull_and_apply_compose() {
 # Initial pull and apply
 pull_and_apply_compose
 
-# Start the Flask app for container health API
-python3 /app/health_check_api.py &
+# Start Gunicorn for production-ready Flask API, bind to localhost only
+gunicorn -w 4 -b 127.0.0.1:5000 health_check_api:app
 
 # Periodically check for updates every 20 seconds
 while true; do
