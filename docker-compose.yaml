@@ -140,8 +140,8 @@ services:
     container_name: compose-updater
     restart: always
     environment:
-      - GITHUB_REPO=https://github.com/<your-github-username>/<your-repo>.git
-      - COMPOSE_FILE_PATH=docker-compose.yml
+      - GITHUB_REPO=https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git
+      - COMPOSE_FILE_PATH=docker-compose/docker-compose.yml
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # Needed to run Docker inside the container
       - ~/data/logs:/app/logs # Logs directory for other containers
