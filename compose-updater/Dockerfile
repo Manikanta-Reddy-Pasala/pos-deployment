@@ -24,16 +24,17 @@ RUN apt-get update && \
     apt-get clean && \
     rm -rf /var/lib/apt/lists/*
 
-# Install Flask for the API
-RUN pip install flask docker gunicorn
+# Install Flask and other Python packages
+RUN pip install flask docker gunicorn gitpython
 
 # Set working directory
 WORKDIR /app
 
-# Copy the start.sh and Flask app to the container
-COPY start.sh /app/start.sh
-COPY health_check_api.py /app/health_check_api.py
-RUN chmod +x /app/start.sh
+# Copy the merged Python script into the container
+COPY main.py /app/main.py
 
-# Set the entrypoint to run the script
-CMD ["/bin/bash", "/app/start.sh"]
+# Expose port 5000
+EXPOSE 5000
+
+# Set the entrypoint to run the Flask app using Gunicorn
+CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "main:app"]

@@ -6,6 +6,7 @@ import time
 import subprocess
 import threading
 import git
+import shutil
 
 app = Flask(__name__)
 
@@ -19,24 +20,54 @@ REPO_DIR = '/app/repo'
 
 # Function to pull the latest docker-compose.yml from GitHub and apply only if changes are detected
 def pull_and_apply_compose():
-    if not os.path.exists(REPO_DIR):
-        # Clone the repository if it doesn't exist
-        git.Repo.clone_from(GITHUB_REPO, REPO_DIR)
-    else:
-        # Check if there are any changes
-        repo = git.Repo(REPO_DIR)
+    try:
+        # Check if the repo directory exists
+        if os.path.exists(REPO_DIR):
+            if os.path.isdir(REPO_DIR):
+                try:
+                    # Check if it's a valid Git repository
+                    repo = git.Repo(REPO_DIR)
+                    print(f"Using existing repository in {REPO_DIR}")
+                except git.exc.InvalidGitRepositoryError:
+                    print(f"Invalid Git repository. Cleaning up {REPO_DIR}...")
+                    shutil.rmtree(REPO_DIR)
+                    print(f"Deleted {REPO_DIR}. Cloning fresh repository.")
+                    repo = git.Repo.clone_from(GITHUB_REPO, REPO_DIR)
+            else:
+                print(f"{REPO_DIR} exists but is not a directory. Aborting.")
+                return
+        else:
+            # Clone the repository if it doesn't exist
+            print(f"Cloning repository from {GITHUB_REPO} into {REPO_DIR}...")
+            repo = git.Repo.clone_from(GITHUB_REPO, REPO_DIR)
+        
+        # Ensure we are on the master branch
+        try:
+            if repo.active_branch.name != 'master':
+                print("Switching to master branch...")
+                repo.git.checkout('master')
+        except Exception as e:
+            print(f"Error switching to master branch: {e}")
+            return
+        
+        # Fetch the latest changes
         current = repo.head.commit
         repo.remotes.origin.fetch()
         latest = repo.head.commit
+        print(f"Current commit: {current}, Latest commit: {latest}")
 
+        # Pull the latest changes if there are any
         if current != latest:
             print("Changes detected, pulling updates...")
-            repo.remotes.origin.pull()
-            # Pull the latest images and bring up only changed services without recreating existing ones
+            repo.remotes.origin.pull('master')
+            # Pull the latest Docker images and update services without recreating unchanged ones
             subprocess.run(['docker-compose', '-f', f"{REPO_DIR}/{COMPOSE_FILE_PATH}", 'pull'], check=True)
             subprocess.run(['docker-compose', '-f', f"{REPO_DIR}/{COMPOSE_FILE_PATH}", 'up', '-d', '--no-recreate'], check=True)
         else:
             print("No changes detected, skipping docker-compose up.")
+    
+    except Exception as e:
+        print(f"Error during the pull-and-apply process: {e}")
 
 # Periodically check for updates every 20 seconds
 def periodic_check():
@@ -79,5 +110,5 @@ def download_logs():
     return send_file(zip_filename, as_attachment=True)
 
 if __name__ == '__main__':
-    # Run the Flask app
-    app.run(host='127.0.0.1', port=5000)
+    # Run the Flask app on 0.0.0.0 to allow external connections
+    app.run(host='0.0.0.0', port=5000)

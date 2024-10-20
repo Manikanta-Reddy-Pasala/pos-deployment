@@ -139,6 +139,8 @@ services:
     image: compose-updater:latest
     container_name: compose-updater
     restart: always
+    ports:
+      - '5000:5000'
     environment:
       - GITHUB_REPO=https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git
       - COMPOSE_FILE_PATH=docker-compose.yaml
