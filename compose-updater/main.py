@@ -110,5 +110,49 @@ def download_logs():
     # Return the zip file as a downloadable attachment
     return send_file(zip_filename, as_attachment=True)
 
+
+
+def get_cpu_memory_usage(container):
+    # Get the container stats (CPU and memory usage details)
+    stats = container.stats(stream=False)
+    
+    # Get the current CPU usage and system usage
+    cpu_delta = stats['cpu_stats']['cpu_usage']['total_usage'] - stats['precpu_stats']['cpu_usage']['total_usage']
+    system_delta = stats['cpu_stats']['system_cpu_usage'] - stats['precpu_stats']['system_cpu_usage']
+    
+    # Number of CPUs in the container
+    num_cpus = len(stats['cpu_stats']['cpu_usage']['percpu_usage']) if 'percpu_usage' in stats['cpu_stats']['cpu_usage'] else 1
+    
+    # Calculate CPU usage percentage
+    cpu_percentage = (cpu_delta / system_delta) * num_cpus * 100 if system_delta > 0 else 0
+    
+    # Get memory usage
+    memory_usage = stats['memory_stats']['usage']
+    memory_limit = stats['memory_stats']['limit']
+    memory_percentage = (memory_usage / memory_limit) * 100 if memory_limit > 0 else 0
+    
+    return {
+        'cpu_usage': f"{cpu_percentage:.2f}%",
+        'memory_usage': f"{memory_usage / (1024 ** 2):.2f} MB",  # Convert to MB
+        'memory_percentage': f"{memory_percentage:.2f}%"
+    }
+
+@app.route('/cpu-memory-usage', methods=['GET'])
+def cpu_memory_usage():
+    usage_stats = {}
+    
+    # Get a list of all running containers
+    containers = client.containers.list()
+    
+    for container in containers:
+        try:
+            # Get the CPU and memory usage of each container
+            usage = get_cpu_memory_usage(container)
+            usage_stats[container.name] = usage
+        except Exception as e:
+            usage_stats[container.name] = f"Error retrieving usage: {str(e)}"
+    
+    return jsonify(usage_stats)
+
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
