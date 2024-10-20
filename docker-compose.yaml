@@ -149,7 +149,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/data/logs:/app/logs
       - ~/.docker/config.json:/root/.docker/config.json
-      - ~/.orbstack/config/docker.json:/root/.docker/config.json
+      # - ~/.orbstack/config/docker.json:/root/.docker/config.json
     networks:
       - app-network
 
