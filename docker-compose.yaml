@@ -135,23 +135,23 @@ services:
     networks:
       - app-network
 
-  compose-updater:
-    image: compose-updater:latest
-    container_name: compose-updater
-    restart: always
-    ports:
-      - '5001:5000'
-    environment:
-      - GITHUB_REPO=https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git
-      - COMPOSE_FILE_PATH=docker-compose.yaml
-      - REQUIRED_SERVICES=compose-updater,mongodb,nats-server,posbackend,watchtower
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - ~/data/logs:/app/logs
-      - ~/.docker/config.json:/root/.docker/config.json
-      # - ~/.orbstack/config/docker.json:/root/.docker/config.json
-    networks:
-      - app-network
+  # compose-updater:
+  #   image: compose-updater:latest
+  #   container_name: compose-updater
+  #   restart: always
+  #   ports:
+  #     - '5001:5000'
+  #   environment:
+  #     - GITHUB_REPO=https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git
+  #     - COMPOSE_FILE_PATH=docker-compose.yaml
+  #     - REQUIRED_SERVICES=compose-updater,mongodb,nats-server,posbackend,watchtower
+  #   volumes:
+  #     - /var/run/docker.sock:/var/run/docker.sock
+  #     - ~/data/logs:/app/logs
+  #     - ~/.docker/config.json:/root/.docker/config.json
+  #     # - ~/.orbstack/config/docker.json:/root/.docker/config.json
+  #   networks:
+  #     - app-network
 
 networks:
   app-network:
