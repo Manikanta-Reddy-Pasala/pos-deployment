@@ -18,6 +18,9 @@ REQUIRED_SERVICES = os.getenv('REQUIRED_SERVICES', 'compose-updater,mongodb,nats
 GITHUB_REPO = os.getenv('GITHUB_REPO', 'https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git')
 COMPOSE_FILE_PATH = os.getenv('COMPOSE_FILE_PATH', 'docker-compose/docker-compose.yaml')
 REPO_DIR = '/app/repo'
+LOG_DIR = "/app/logs"
+EXCLUDED_LOGS = ["mongodb.log", "watchtower.log", "nats-server.log", "compose-updater.log"]
+
 
 # Function to pull the latest docker-compose.yml from GitHub and apply only if changes are detected
 def pull_and_apply_compose():
@@ -93,16 +96,18 @@ def health_check():
 # Route to download logs of all running containers as a zip file
 @app.route('/logs', methods=['GET'])
 def download_logs():
-    log_dir = "/app/logs"
+    # Create a unique zip file name
     zip_filename = f"/app/logs_{int(time.time())}.zip"
     
+    # Create a zip file and add only relevant log files
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
-        for container in client.containers.list():
-            log_file_path = os.path.join(log_dir, f"{container.name}.log")
-            with open(log_file_path, 'w') as f:
-                f.write(container.logs().decode('utf-8'))
-            zipf.write(log_file_path, arcname=f"{container.name}.log")
+        for root, dirs, files in os.walk(LOG_DIR):
+            for file in files:
+                if file not in EXCLUDED_LOGS:  # Exclude unwanted logs
+                    file_path = os.path.join(root, file)
+                    zipf.write(file_path, arcname=file)  # Add the file to the zip archive
     
+    # Return the zip file as a downloadable attachment
     return send_file(zip_filename, as_attachment=True)
 
 if __name__ == '__main__':
