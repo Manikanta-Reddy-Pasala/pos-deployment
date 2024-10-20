@@ -141,7 +141,7 @@ services:
     restart: always
     environment:
       - GITHUB_REPO=https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git
-      - COMPOSE_FILE_PATH=docker-compose/docker-compose.yaml
+      - COMPOSE_FILE_PATH=docker-compose.yaml
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock # Needed to run Docker inside the container
       - ~/data/logs:/app/logs # Logs directory for other containers
