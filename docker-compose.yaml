@@ -33,7 +33,7 @@ services:
     healthcheck:
       test: ['CMD', 'curl', '-f', 'http://localhost:8090/actuator/health']
       interval: 30s
-      timeout: 10s
+      timeout: 20s
       retries: 3
       start_period: 40s
 
@@ -149,7 +149,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/data/logs:/app/logs
       - ~/.docker/config.json:/root/.docker/config.json
-      - ~/.orbstack/config:/root/.docker/config.json
+      - ~/.orbstack/config/docker.json:/root/.docker/config.json
     networks:
       - app-network
 
