@@ -140,13 +140,13 @@ services:
     container_name: compose-updater
     restart: always
     ports:
-      - '5000:5000'
+      - '5000:5000' # Maps container's port 5000 to host's port 5000
     environment:
       - GITHUB_REPO=https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git
       - COMPOSE_FILE_PATH=docker-compose.yaml
     volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # Needed to run Docker inside the container
-      - ~/data/logs:/app/logs # Logs directory for other containers
+      - /var/run/docker.sock:/var/run/docker.sock # Allows Docker commands within the container
+      - ~/data/logs:/app/logs # Maps host's logs directory to container's logs directory
     networks:
       - app-network
 

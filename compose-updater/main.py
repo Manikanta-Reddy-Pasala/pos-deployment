@@ -21,11 +21,9 @@ REPO_DIR = '/app/repo'
 # Function to pull the latest docker-compose.yml from GitHub and apply only if changes are detected
 def pull_and_apply_compose():
     try:
-        # Check if the repo directory exists
         if os.path.exists(REPO_DIR):
             if os.path.isdir(REPO_DIR):
                 try:
-                    # Check if it's a valid Git repository
                     repo = git.Repo(REPO_DIR)
                     print(f"Using existing repository in {REPO_DIR}")
                 except git.exc.InvalidGitRepositoryError:
@@ -37,30 +35,21 @@ def pull_and_apply_compose():
                 print(f"{REPO_DIR} exists but is not a directory. Aborting.")
                 return
         else:
-            # Clone the repository if it doesn't exist
             print(f"Cloning repository from {GITHUB_REPO} into {REPO_DIR}...")
             repo = git.Repo.clone_from(GITHUB_REPO, REPO_DIR)
         
-        # Ensure we are on the master branch
-        try:
-            if repo.active_branch.name != 'master':
-                print("Switching to master branch...")
-                repo.git.checkout('master')
-        except Exception as e:
-            print(f"Error switching to master branch: {e}")
-            return
+        if repo.active_branch.name != 'master':
+            print("Switching to master branch...")
+            repo.git.checkout('master')
         
-        # Fetch the latest changes
         current = repo.head.commit
         repo.remotes.origin.fetch()
         latest = repo.head.commit
         print(f"Current commit: {current}, Latest commit: {latest}")
 
-        # Pull the latest changes if there are any
         if current != latest:
             print("Changes detected, pulling updates...")
             repo.remotes.origin.pull('master')
-            # Pull the latest Docker images and update services without recreating unchanged ones
             subprocess.run(['docker-compose', '-f', f"{REPO_DIR}/{COMPOSE_FILE_PATH}", 'pull'], check=True)
             subprocess.run(['docker-compose', '-f', f"{REPO_DIR}/{COMPOSE_FILE_PATH}", 'up', '-d', '--no-recreate'], check=True)
         else:
@@ -99,7 +88,6 @@ def download_logs():
     log_dir = "/app/logs"
     zip_filename = f"/app/logs_{int(time.time())}.zip"
     
-    # Create a zip file of logs
     with zipfile.ZipFile(zip_filename, 'w') as zipf:
         for container in client.containers.list():
             log_file_path = os.path.join(log_dir, f"{container.name}.log")
@@ -110,5 +98,4 @@ def download_logs():
     return send_file(zip_filename, as_attachment=True)
 
 if __name__ == '__main__':
-    # Run the Flask app on 0.0.0.0 to allow external connections
     app.run(host='0.0.0.0', port=5000)

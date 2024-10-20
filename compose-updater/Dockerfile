@@ -25,7 +25,7 @@ RUN apt-get update && \
     rm -rf /var/lib/apt/lists/*
 
 # Install Flask and other Python packages
-RUN pip install flask docker gunicorn gitpython
+RUN pip install flask docker gitpython
 
 # Set working directory
 WORKDIR /app
@@ -33,8 +33,8 @@ WORKDIR /app
 # Copy the merged Python script into the container
 COPY main.py /app/main.py
 
-# Expose port 5000
+# Expose port 5000 (optional)
 EXPOSE 5000
 
-# Set the entrypoint to run the Flask app using Gunicorn
-CMD ["gunicorn", "-w", "4", "-b", "0.0.0.0:5000", "main:app"]
+# Run the Flask app directly
+CMD ["python", "/app/main.py"]
