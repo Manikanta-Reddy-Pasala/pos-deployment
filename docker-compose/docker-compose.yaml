@@ -135,19 +135,6 @@ services:
     networks:
       - app-network
 
-  compose-updater:
-    image: compose-updater:latest
-    container_name: compose-updater
-    restart: always
-    environment:
-      - GITHUB_REPO=https://github.com/<your-github-username>/<your-repo>.git
-      - COMPOSE_FILE_PATH=docker-compose.yml
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock # Needed to run Docker inside the container
-      - ~/data/logs:/app/logs # Logs directory for other containers
-    networks:
-      - app-network
-
 networks:
   app-network:
     driver: bridge
