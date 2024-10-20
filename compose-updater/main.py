@@ -25,7 +25,6 @@ REPO_DIR = '/app/repo'
 LOG_DIR = "/app/logs"
 EXCLUDED_LOGS = ["mongodb.log", "watchtower.log", "nats-server.log", "compose-updater.log"]
 
-# Function to pull the latest docker-compose.yml from GitHub and apply only if changes are detected
 def pull_and_apply_compose():
     logging.info("Checking for updates in the repository...")
     try:
@@ -46,17 +45,23 @@ def pull_and_apply_compose():
             logging.info(f"Cloning repository from {GITHUB_REPO} into {REPO_DIR}...")
             repo = git.Repo.clone_from(GITHUB_REPO, REPO_DIR)
 
-        # Ensure the repository is on the master branch
+        # Ensure we are on the master branch
         if repo.active_branch.name != 'master':
             logging.info("Switching to master branch...")
             repo.git.checkout('master')
 
-        # Fetch the latest changes and update if necessary
-        current = repo.head.commit
+        # Force reset to remove local changes (if any) and ensure the repo is clean
+        logging.info("Resetting repository to the latest commit from origin...")
+        repo.git.reset('--hard', 'origin/master')
+
+        # Fetch the latest changes from the origin
         repo.remotes.origin.fetch()
-        latest = repo.head.commit
+        latest = repo.remotes.origin.refs.master.commit  # Get the latest commit from remote master
+        current = repo.head.commit  # Get the current commit in the local repo
+
         logging.info(f"Current commit: {current}, Latest commit: {latest}")
 
+        # Pull the latest changes if there are any
         if current != latest:
             logging.info("Changes detected, pulling updates...")
             repo.remotes.origin.pull('master')
