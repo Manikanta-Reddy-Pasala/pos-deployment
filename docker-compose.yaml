@@ -105,7 +105,7 @@ services:
           memory: 1024M # Limit to 1GB RAM
         reservations:
           cpus: '0.2' # Reserve 0.5 CPU cores
-          memory: 64M # Reserve 512MB RAM
+          memory: 63M # Reserve 512MB RAM
     networks:
       - app-network
 
@@ -148,7 +148,7 @@ services:
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - ~/data/logs:/app/logs
-      # - ~/.docker/config.json:/root/.docker/config.json
+      - ./config/config.json:/root/.docker/config.json
     networks:
       - app-network
 
