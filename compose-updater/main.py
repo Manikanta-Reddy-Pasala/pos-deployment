@@ -31,6 +31,7 @@ def pull_and_apply_compose():
     REPO_DIR = '/app/repo'
     
     try:
+        # Check if the repository exists and is valid
         if os.path.exists(REPO_DIR):
             if os.path.isdir(REPO_DIR):
                 try:
@@ -47,11 +48,17 @@ def pull_and_apply_compose():
         else:
             logging.info(f"Cloning repository from {GITHUB_REPO} into {REPO_DIR}...")
             repo = git.Repo.clone_from(GITHUB_REPO, REPO_DIR)
-        
+
+        # Ensure we are on the master branch
         if repo.active_branch.name != 'master':
             logging.info("Switching to master branch...")
             repo.git.checkout('master')
-        
+
+        # Force reset to remove local changes and ensure the repo is clean
+        logging.info("Resetting repository to the latest commit from origin...")
+        repo.git.reset('--hard', 'origin/master')
+
+        # Fetch latest changes
         current = repo.head.commit
         repo.remotes.origin.fetch()
         latest = repo.head.commit
@@ -68,7 +75,8 @@ def pull_and_apply_compose():
     
     except Exception as e:
         logging.error(f"Error during the pull-and-apply process: {e}")
-# Function to run periodic checks
+
+        
 def periodic_check():
     while True:
         logging.info("Starting periodic update check...")
