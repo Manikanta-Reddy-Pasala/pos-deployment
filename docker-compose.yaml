@@ -61,7 +61,7 @@ services:
 
   # MongoDB
   mongodb:
-    image: docker.oneshell.in/library/mongo:latest
+    image: mongo:latest
     container_name: mongodb
     restart: always
     volumes:
