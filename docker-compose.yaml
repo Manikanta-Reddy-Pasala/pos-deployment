@@ -136,7 +136,7 @@ services:
       - app-network
 
   compose-updater:
-    image: compose-updater:latest
+    image: docker.oneshell.in/library/compose-updater:latest
     container_name: compose-updater
     restart: always
     labels:
