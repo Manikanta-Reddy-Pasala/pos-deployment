@@ -29,7 +29,7 @@ services:
           memory: 2536M # Limit to 2.5GB RAM
         reservations:
           cpus: '1' # Reserve 1 CPU core
-          memory: 1024M # Reserve 1Gb RAM
+          memory: 1524M # Reserve 1Gb RAM
     networks:
       - app-network
     healthcheck:
