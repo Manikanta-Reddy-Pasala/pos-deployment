@@ -18,6 +18,8 @@ services:
       - NATS_REMOTE_URL=nats://nats.oneshell.in:4222
       - SPRING_PROFILES_ACTIVE=default
       - MONGODB_URI=mongodb://mongodb:27017/pos
+      - JAVA_OPTS=-Xms1g -Xmx2g # Increased heap size for JVM
+
     volumes:
       - ~/data/logs:/var/log/posbackend # Host directory mapped to container log directory
     deploy:
@@ -27,7 +29,7 @@ services:
           memory: 2536M # Limit to 2.5GB RAM
         reservations:
           cpus: '1' # Reserve 1 CPU core
-          memory: 500M # Reserve 512MB RAM
+          memory: 1024M # Reserve 1Gb RAM
     networks:
       - app-network
     healthcheck:
