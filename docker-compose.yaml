@@ -3,7 +3,6 @@
 version: '3.8'
 
 services:
-  # Spring Boot Application
   posbackend:
     image: docker.oneshell.in/library/posbackend:latest
     container_name: posbackend
@@ -14,22 +13,21 @@ services:
       - mongodb
       - nats-server
     environment:
-      - NATS_URL=nats://nats-server:4222
-      - NATS_REMOTE_URL=nats://nats.oneshell.in:4222
+      - NATS_URL=${NATS_URL}
+      - NATS_REMOTE_URL=${NATS_REMOTE_URL}
       - SPRING_PROFILES_ACTIVE=default
-      - MONGODB_URI=mongodb://mongodb:27017/pos
-      - JAVA_OPTS=-Xms1g -Xmx2g -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xlog:gc* # JVM GC Logging options
-
+      - MONGODB_URI=${MONGODB_URI}
+      - JAVA_OPTS=${JAVA_OPTS}
     volumes:
-      - ~/data/logs:/var/log/posbackend # Host directory mapped to container log directory
+      - ~/data/java/logs:/var/log/posbackend
     deploy:
       resources:
         limits:
-          cpus: '2.0' # Limit to 2 CPU cores
-          memory: 2536M # Limit to 2.5GB RAM
+          cpus: '2.0'
+          memory: 2536M
         reservations:
-          cpus: '1' # Reserve 1 CPU core
-          memory: 1524M # Reserve 1Gb RAM
+          cpus: '1'
+          memory: 1524M
     networks:
       - app-network
     healthcheck:
@@ -38,8 +36,12 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
 
-  # Node.js Backend Application
   posNodeBackend:
     image: docker.oneshell.in/library/posnodebackend:latest
     container_name: posNodeBackend
@@ -51,7 +53,7 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      - ~/data/logs:/var/log/posNodeBackend # Host directory mapped to container log directory
+      - ~/data/node/logs:/var/log/posNodeBackend
     networks:
       - app-network
     healthcheck:
@@ -60,14 +62,18 @@ services:
       timeout: 10s
       retries: 3
       start_period: 40s
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
 
-  # MongoDB
   mongodb:
     image: mongo:latest
     container_name: mongodb
     restart: always
     volumes:
-      - ~/data:/data/db
+      - ~/data/mongo-data:/data/db
     labels:
       - 'com.centurylinklabs.watchtower.enable=false'
     ports:
@@ -75,15 +81,25 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '1.0' # Limit to 1 CPU core
-          memory: 1536M # Limit to 1.5GB RAM
+          cpus: '1.0'
+          memory: 1536M
         reservations:
-          cpus: '0.3' # Reserve 0.5 CPU cores
-          memory: 300M # Reserve 512MB RAM
+          cpus: '0.3'
+          memory: 300M
     networks:
       - app-network
+    healthcheck:
+      test: ['CMD', 'mongo', '--eval', "db.adminCommand('ping')"]
+      interval: 30s
+      timeout: 10s
+      retries: 5
+      start_period: 20s
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
 
-  # NATS Server
   nats-server:
     image: docker.oneshell.in/library/nats:latest
     container_name: nats-server
@@ -95,6 +111,7 @@ services:
       - '8222:8222'
       - '8080:8080'
     volumes:
+      - ~/data/nats-data:/data/jetstream
       - ./nats-server.conf:/nats-server.conf
     command: ['--config', '/nats-server.conf']
     environment:
@@ -103,15 +120,19 @@ services:
     deploy:
       resources:
         limits:
-          cpus: '0.75' # Limit to 0.75 CPU cores
-          memory: 1024M # Limit to 1GB RAM
+          cpus: '0.75'
+          memory: 1024M
         reservations:
-          cpus: '0.2' # Reserve 0.5 CPU cores
-          memory: 64M # Reserve 512MB RAM
+          cpus: '0.2'
+          memory: 64M
     networks:
       - app-network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
 
-  # Watchtower
   watchtower:
     image: containrrr/watchtower
     container_name: watchtower
@@ -124,16 +145,16 @@ services:
       - WATCHTOWER_ROLLING_RESTART=true
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ./config/config.json:/config.json # Mount Docker auth file
+      - ./config/config.json:/config.json
     command: --interval 20
     deploy:
       resources:
         limits:
-          cpus: '0.2' # Limit to 0.5 CPU cores
-          memory: 128M # Limit to 128MB RAM
+          cpus: '0.2'
+          memory: 128M
         reservations:
-          cpus: '0.1' # Reserve 0.25 CPU cores
-          memory: 64M # Reserve 64MB RAM
+          cpus: '0.1'
+          memory: 64M
     networks:
       - app-network
 
@@ -146,15 +167,20 @@ services:
     ports:
       - '5001:5000'
     environment:
-      - GITHUB_REPO=https://github.com/Manikanta-Reddy-Pasala/pos-deployment.git
-      - COMPOSE_FILE_PATH=docker-compose.yaml
-      - REQUIRED_SERVICES=compose-updater,mongodb,nats-server,posbackend,watchtower
+      - GITHUB_REPO=${GITHUB_REPO}
+      - COMPOSE_FILE_PATH=${COMPOSE_FILE_PATH}
+      - REQUIRED_SERVICES=${REQUIRED_SERVICES}
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
-      - ~/data/logs:/app/logs
+      - ~/data/python/logs:/app/logs
       - ./config/config.json:/root/.docker/config.json
     networks:
       - app-network
+    logging:
+      driver: 'json-file'
+      options:
+        max-size: '10m'
+        max-file: '3'
 
 networks:
   app-network:
