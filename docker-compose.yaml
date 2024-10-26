@@ -17,17 +17,17 @@ services:
       - NATS_REMOTE_URL=${NATS_REMOTE_URL}
       - SPRING_PROFILES_ACTIVE=default
       - MONGODB_URI=${MONGODB_URI}
-      - JAVA_OPTS=${JAVA_OPTS}
+      - JAVA_OPTS=-Xms3g -Xmx3.5g -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xlog:gc*
     volumes:
       - ~/data/java/logs:/var/log/posbackend
     deploy:
       resources:
         limits:
           cpus: '2.0'
-          memory: 2536M
+          memory: 4096M # Increased memory limit to 4GB
         reservations:
           cpus: '1'
-          memory: 1524M
+          memory: 3072M # Increased reservation to 3GB
     networks:
       - app-network
     healthcheck:
