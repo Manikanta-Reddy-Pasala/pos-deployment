@@ -7,6 +7,8 @@ services:
     image: docker.oneshell.in/library/posbackend:latest
     container_name: posbackend
     restart: always
+    labels:
+      - 'com.centurylinklabs.watchtower.enable=true'
     ports:
       - '8090:8090'
     depends_on:
@@ -46,6 +48,8 @@ services:
     image: docker.oneshell.in/library/posnodebackend:latest
     container_name: posNodeBackend
     restart: always
+    labels:
+      - 'com.centurylinklabs.watchtower.enable=true'
     ports:
       - '3001:3001'
     depends_on:
