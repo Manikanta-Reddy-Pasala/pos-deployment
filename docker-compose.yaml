@@ -48,6 +48,8 @@ services:
     image: docker.oneshell.in/library/posnodebackend:latest
     container_name: posNodeBackend
     restart: always
+    privileged: true # Runs the container with extended privileges
+    network_mode: 'host' # Use the host network for direct access to services
     labels:
       - 'com.centurylinklabs.watchtower.enable=true'
     ports:
@@ -57,6 +59,7 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
+      - C:\Windows\System32\spool:/spool:nocopy # Mount the Windows print spooler directory; won't fail if not present
       - ~/data/node/logs:/var/log/posNodeBackend
     networks:
       - app-network
