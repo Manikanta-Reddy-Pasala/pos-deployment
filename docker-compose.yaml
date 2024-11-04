@@ -93,8 +93,6 @@ services:
         reservations:
           cpus: '0.3'
           memory: 300M
-    networks:
-      - app-network
     healthcheck:
       test: ['CMD', 'mongo', '--eval', "db.adminCommand('ping')"]
       interval: 30s
