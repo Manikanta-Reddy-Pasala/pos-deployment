@@ -75,6 +75,22 @@ services:
         max-size: '10m'
         max-file: '3'
 
+  posFrontend:
+    image: docker.oneshell.in/library/pos:latest
+    container_name: posFrontend
+    restart: always
+    labels:
+      - 'com.centurylinklabs.watchtower.enable=true'
+    ports:
+      - '80:80'
+    environment:
+      - NODE_ENV=production
+    networks:
+      - app-network
+    depends_on:
+      - posbackend
+      - posNodeBackend
+
   mongodb:
     image: mongo:latest
     container_name: mongodb
