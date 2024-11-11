@@ -26,10 +26,10 @@ services:
       resources:
         limits:
           cpus: '2.0'
-          memory: 4096M # Increased memory limit to 4GB
+          memory: 4096M
         reservations:
           cpus: '1'
-          memory: 3072M # Increased reservation to 3GB
+          memory: 3072M
     networks:
       - app-network
     healthcheck:
@@ -48,8 +48,7 @@ services:
     image: docker.oneshell.in/library/posnodebackend:latest
     container_name: posNodeBackend
     restart: always
-    privileged: true # Runs the container with extended privileges
-    # network_mode: 'host' # Use the host network for direct access to services
+    privileged: true
     labels:
       - 'com.centurylinklabs.watchtower.enable=true'
     ports:
@@ -59,7 +58,6 @@ services:
     environment:
       - NODE_ENV=production
     volumes:
-      # - C:\Windows\System32\spool:/spool:nocopy # Mount the Windows print spooler directory; won't fail if not present
       - ~/data/node/logs:/var/log/posNodeBackend
     networks:
       - app-network
@@ -83,7 +81,7 @@ services:
       - 'com.centurylinklabs.watchtower.enable=true'
     ports:
       - '80:80'
-      - '443:443' # Expose port 443 for HTTPS
+      - '443:443'
     environment:
       - NODE_ENV=production
     networks:
