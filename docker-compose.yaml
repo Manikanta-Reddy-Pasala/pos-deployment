@@ -87,8 +87,7 @@ services:
     networks:
       - app-network
     volumes:
-      - /etc/nginx/certs
-      - /Users/manip/data/pos/cert:/etc/nginx/certs
+      - ~/data/pos/cert:/etc/nginx/certs
     depends_on:
       - posbackend
       - posNodeBackend
