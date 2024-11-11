@@ -87,6 +87,8 @@ services:
       - NODE_ENV=production
     networks:
       - app-network
+    volumes:
+      - ~/data/pos/cert:/etc/nginx/certs
     depends_on:
       - posbackend
       - posNodeBackend
