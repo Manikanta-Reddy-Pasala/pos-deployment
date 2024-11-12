@@ -81,13 +81,10 @@ services:
       - 'com.centurylinklabs.watchtower.enable=true'
     ports:
       - '80:80'
-      - '443:443'
     environment:
       - NODE_ENV=production
     networks:
       - app-network
-    volumes:
-      - ~/data/pos/cert:/etc/nginx/certs
     depends_on:
       - posbackend
       - posNodeBackend
