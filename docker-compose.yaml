@@ -16,7 +16,7 @@ services:
       - nats-server
     environment:
       - NATS_URL=${NATS_URL}
-      - NATS_REMOTE_URL=${NATS_REMOTE_URL}
+      - NATS_REMOTE_URL=nats://178.156.139.110:4222
       - SPRING_PROFILES_ACTIVE=default
       - MONGODB_URI=${MONGODB_URI}
       - JAVA_OPTS=-Xms3g -Xmx3.5g -XX:+PrintGCDetails -XX:+PrintGCTimeStamps -Xlog:gc*
