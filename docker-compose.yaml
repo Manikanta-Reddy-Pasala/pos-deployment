@@ -210,23 +210,6 @@ services:
       options:
         max-size: '10m'
         max-file: '3'
-  PosPythonBackend:
-    image: docker.oneshell.in/library/pos-python-backend:latest
-    container_name: PosPythonBackend
-    restart: always
-    labels:
-      - 'com.centurylinklabs.watchtower.enable=true'
-    ports:
-      - '5200:5100'
-    volumes:
-      - ~/data:/app/data
-    networks:
-      - app-network
-    logging:
-      driver: 'json-file'
-      options:
-        max-size: '10m'
-        max-file: '3'
 
 networks:
   app-network:
