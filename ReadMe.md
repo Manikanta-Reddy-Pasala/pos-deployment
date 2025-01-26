@@ -9,5 +9,3 @@ run the command "docker compose up"
 # node modules
 
 this is needed for printer util
-
-test
