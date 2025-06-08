@@ -4,7 +4,7 @@ version: '3.8'
 
 services:
   posbackend:
-    image: docker.oneshell.in/library/posbackend:latest
+    image: ghcr.io/oneshellsolutions/posbackend:latest
     container_name: posbackend
     restart: always
     labels:
