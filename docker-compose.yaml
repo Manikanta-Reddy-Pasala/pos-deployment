@@ -145,7 +145,7 @@ services:
         max-file: '3'
 
   nats-server:
-    image: docker.oneshell.in/library/nats:latest
+    image: nats:latest
     container_name: nats-server
     restart: always
     labels:
